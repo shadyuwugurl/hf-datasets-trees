@@ -31,3 +31,29 @@ Batch2 (15): Qwen, ai21labs, TokenRhythm, sequelbox, Blackfrost-AI, win10, vcruz
 - Foundations (Qwen/google/meta/nvidia) pretraining largely untagged; flagship `dataset:` hits are WorldPM/AgentWorld/WebWorld, Nemotron splits, FLAN, ViT/imagenet, wav2vec2/librispeech, bart/cnn_dailymail, roberta/bookcorpus/wikipedia.
 - Quants inherit, ~0 new datasets; merges/finetunes add the long tail (openbmb, TeichAI, armand0e, PocketDoc, NewEden, etc.).
 - Rate limit 500/5min respected (0.5-2s sleep, 429 backoff). curl -k (env SSL verify broken).
+
+## Batch3 org-crawl (17 orgs + 4 anchor trees, 2026-09-25)
+
+Script: `crawl_batch3.py` (raw per-page dumps + cursor state in `data_batch3/`,
+resumable). Output `batch3-orgs-list.txt` (**6641 unique**) and
+`combined-extended-list.txt` (**11375 unique** = batch1 + batch2 + committed
+batch3 tag-sweep + batch3-orgs + combined-full bodies, deduped). Committed
+`batch3-list.txt` (tag sweep), `combined-full-pages-list.txt` and
+`combined-deduped-list.txt` were NOT overwritten.
+
+Orgs (models/datasets): bartowski 2462/0, QuantFactory 1420/0, mradermacher
+70307/0, ggml-org 199/1, unsloth 1460/15, huihui-ai 186/13, Sao10K 34/3,
+TehVenom 43/0, NousResearch 126/39, arcee-ai 204/63, MaziyarPanahi 2816/52,
+mistralai 75/4, microsoft 544/118, allenai 970/1287, deepseek-ai 105/2,
+upstage 26/6, MiniMaxAI 21/7. No orgs skipped (all non-empty after casing probe).
+
+Anchor trees (finetune/adapter/merge/quantization): Qwen3-32B 585/460/19/0,
+Mistral-7B-Instruct-v0.3 538/890/27/0, DeepSeek-R1 326/122/5/0,
+Hermes-3-Llama-3.1-8B 39/287/48/0.
+
+API corrections vs old notes: tree filter type is `quantization` (not
+`quantized`); sort must be `sort=trendingScore&direction=-1` (`sort=trending`
+returns 400); `p=` page param is dead, cursor `Link: rel="next"` hops only;
+`author=` is exact case-sensitive (probe casing first); 429 backoff via
+RateLimit/Retry-After header (sleep t+5, retry same URL); 1.0s sleep, single
+worker. All four `quantization` trees returned 0 for these anchors.
