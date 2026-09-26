@@ -57,3 +57,12 @@ returns 400); `p=` page param is dead, cursor `Link: rel="next"` hops only;
 `author=` is exact case-sensitive (probe casing first); 429 backoff via
 RateLimit/Retry-After header (sleep t+5, retry same URL); 1.0s sleep, single
 worker. All four `quantization` trees returned 0 for these anchors.
+
+## Rebuild 2026-09-26: combined-extended-list.txt refreshed (64,325 unique)
+
+Concurrent session expanded `batch3-list.txt` 2714 -> 57360 via deep per-tag
+sweep (commit 0035b03), which left `combined-extended-list.txt` (11375) stale
+— 52,950 batch3 entries missing. Rebuilt as byte-exact union of batch1 +
+batch2 + batch3 + batch3-orgs + combined-full + combined-deduped bodies,
+deduped, case-insensitive sorted. Verified: 64,325 unique, 0 `base_model:` /
+`dataset:` leaks, 0 dupes, 0 sort disorders. Source lists untouched.
